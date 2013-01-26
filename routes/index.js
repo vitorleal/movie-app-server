@@ -1,7 +1,11 @@
 var jsdom = require('jsdom'),
     tmdb  = require('tmdbv3').init('59d35074bb75ae5c4e0bf99e819648c2');
 
-exports.index = function(req, res){
+exports.index = function(req, res) {
+  res.send({ type: "error" });
+}
+
+exports.api = function(req, res){
   var url   = 'http://www.google.com/movies?near=' + req.params.address,
       itens = [],
       item = function () {
@@ -19,39 +23,43 @@ exports.index = function(req, res){
         this.times    = []
       }
 
-  jsdom.env(url,['http://code.jquery.com/jquery-1.5.min.js'],
-    function(errors, window) {
-        var theaters = window.$('.theater');
 
-        theaters.each(function (key, value) {
-          var cine             = new item();
-          cine.theater.name    = window.$(this).find('.desc .name a').text();
-          cine.theater.address = window.$(this).find('.desc .info').text();
-          cine.theater.id      = window.$(this).find('.desc').attr('id').split('_')[1];
+  // Parse the result
+  jsdom.env(url, ['http://code.jquery.com/jquery-1.5.min.js'], function(errors, window) {
+    var theaters = window.$('.theater');
 
-          var movies = window.$(this).find('.showtimes .movie');
+    theaters.each(function (key, value) {
+      var $  = window.$,
+          cine   = new item(),
+          movies = $(this).find('.showtimes .movie');
 
-          movies.each(function (key, value) {
-            var peli      = new movie();
-            peli.title    = window.$(this).find('.name a').text();
-            peli.duration = window.$(this).find('.info').text();
-            peli.id       = window.$(this).find('.name a').attr('href').split('id=')[1];
-            var horarios  = window.$(this).find('.times a');
+      cine.theater.name    = $(this).find('.desc .name a').text();
+      cine.theater.address = $(this).find('.desc .info').text();
+      cine.theater.id      = $(this).find('.desc').attr('id').split('_')[1];
 
-            //tmdb.movie_info(peli.title, function(err, res){
-              //console.log(res);
-            //});
 
-            horarios.each(function (key, value) {
-              peli.times.push(window.$(this).text());
-            });
+      movies.each(function (key, value) {
+        var peli      = new movie()
+            horarios  = $(this).find('.times > span');
 
-            cine.movies.push(peli);
-          });
+        peli.title    = $(this).find('.name a').text();
+        peli.duration = $(this).find('.info').text();
+        peli.id       = $(this).find('.name a').attr('href').split('id=')[1];
 
-          itens.push(cine);
+        horarios.each(function (key, value) {
+          peli.times.push($.trim($(this).text().replace('&nbsp', '')));
         });
+        //tmdb.movie_info(peli.title, function(err, res){
+          //console.log(res);
+        //});
 
-        res.send(itens);
+
+        cine.movies.push(peli);
+      });
+
+      itens.push(cine);
     });
+
+    res.send(itens);
+  });
 };

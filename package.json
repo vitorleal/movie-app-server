@@ -15,7 +15,6 @@
   },
   "dependencies": {
     "express"   : "*",
-    "apricot"   : "*",
     "jsdom"     : "*",
     "htmlparser": "*",
     "tmdbv3"    : "*",

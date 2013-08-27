@@ -2,7 +2,6 @@ var express = require('express'),
     routes  = require('./routes'),
     http    = require('http'),
     path    = require('path'),
-    apricot = require('apricot'),
 
     app     = express();
 

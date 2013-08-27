@@ -18,6 +18,6 @@
     "jsdom"     : "*",
     "htmlparser": "*",
     "tmdbv3"    : "*",
-    "find-cine" : "0.3.5"
+    "find-cine" : "*"
   }
 }

@@ -6,8 +6,7 @@ exports.index = function(req, res) {
 
 exports.api = function(req, res){
   res.charset = 'utf8';
-  findCine.near(req.params.address, function(err, results) {
-    res.send(results);
+  findCine.near(req.params.address, function(result) {
+    res.send(result);
   });
 };
-
